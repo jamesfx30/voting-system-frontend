@@ -1,0 +1,25 @@
+# Node.js dependencies
+/node_modules/
+
+# Local development and build artifacts
+.env
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.vscode/
+.idea/
+
+# Database files
+*.db
+/data/*.db # If you have a 'data' folder for DB files
+*.sqlite
+*.sqlite3
+
+# Uploaded files (should not be in Git)
+/public/uploads/
+
+# OS and editor specific files
+.DS_Store # macOS
+Thumbs.db # Windows
+.snapshots/ # Your specific snapshots directories
