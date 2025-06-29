@@ -1,0 +1,84 @@
+# .gitpod.yml
+# This file configures your GitPod workspace for the voting-system-frontend project.
+
+tasks:
+  - name: Frontend Setup and Start
+    # This 'before' command will run before the main command.
+    # It replaces the [GITPOD_HOSTNAME] placeholder in vite.config.js
+    # with the actual hostname of the current GitPod workspace.
+    # This ensures Vite always knows the correct host for HMR and access.
+    before: |
+      echo "Updating vite.config.js with current GitPod hostname..."
+      CURRENT_GITPOD_HOSTNAME=$(echo "$GITPOD_WORKSPACE_URL" | sed -E 's/https?:\/\///' | cut -d'/' -f1)
+      sed -i "s/\\[GITPOD_HOSTNAME\\]/${CURRENT_GITPOD_HOSTNAME}/g" vite.config.js
+      echo "vite.config.js updated successfully with $CURRENT_GITPOD_HOSTNAME"
+      
+      # Ensure frontend dependencies are installed
+      echo "Installing frontend dependencies..."
+      npm install --prefix .
+
+    # The 'command' task will run after the 'before' task.
+    # This starts your frontend development server.
+    command: |
+      echo "Starting frontend development server..."
+      npm run dev
+
+  - name: Backend Setup and Start
+    # Ensure backend dependencies are installed and .env is set up
+    init: |
+      cd backend
+      echo "Installing backend dependencies..."
+      npm install
+      
+      echo "Creating/Updating backend .env file..."
+      # Write the content to your .env file using the 'cat' here-document
+      # Ensure these values match your local .env and Paystack keys
+      cat << EOF > .env
+      JWT_SECRET=nryy6cZQ0d5hZrotr+fyMKvwJQPmpA5eSMSCjBmru+4=
+
+      # Backend Environment Variables for GitPod Development
+      PAYSTACK_PUBLIC_KEY=pk_test_8e6be318166adbe1c22ac7c24cf22f7c174155fa
+      PAYSTACK_SECRET_KEY=sk_test_5bd1d6ac0b27c299c0403d05500cb7b7b3bf56fb2
+
+      # PostgreSQL Database Configuration
+      PG_USER=postgres
+      PG_HOST=localhost
+      PG_DATABASE=postgres
+      PG_PASSWORD=jamesfx30
+      PG_PORT=5432
+      EOF
+      echo "Backend .env file configured."
+
+    # Start the backend server
+    command: |
+      cd backend
+      echo "Starting backend server..."
+      npm start
+
+# Define services needed for the workspace.
+# This configures a PostgreSQL database.
+services:
+  # 'database' is the alias by which your application can reach the PostgreSQL service.
+  # Your Node.js backend connects to PG_HOST=localhost, and GitPod will route that
+  # to this 'database' service.
+  database:
+    # Use the official PostgreSQL Docker image. Version 13 is a good stable choice.
+    image: postgres:13
+    # Environment variables for the PostgreSQL container itself.
+    # These MUST match the PG_USER, PG_PASSWORD, PG_DATABASE from your .env file
+    # for your Node.js backend to connect successfully.
+    env:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: jamesfx30 # Your actual PostgreSQL password from .env
+      POSTGRES_DB: postgres
+    # Expose container port 5432 within GitPod's internal network.
+    ports:
+      - 5432
+
+# List of ports to expose to the browser and their default behavior.
+# Port 5173 for frontend, 5000 for backend.
+ports:
+  - port: 5173
+    onOpen: open-browser # Automatically opens frontend in a new browser tab
+  - port: 5000
+    onOpen: open-browser # Automatically opens backend in a new browser tab
