@@ -59,8 +59,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: jamesfx30 # Your actual PostgreSQL password from .env
       POSTGRES_DB: postgres
-    # Removed: 'ports: - 5432' from here, as it was causing the "additional properties" error.
-    # GitPod will automatically expose this via the top-level 'ports' section if needed.
+    # NO 'ports: - 5432' here! It's declared at the top-level 'ports' section.
 
 # List of ports to expose to the browser and their default behavior.
 # Port 5173 for frontend, 5000 for backend.
@@ -69,5 +68,5 @@ ports:
     onOpen: open-browser # Automatically opens frontend in a new browser tab
   - port: 5000
     onOpen: open-browser # Automatically opens backend in a new browser tab
-  - port: 5432 # Still declare the PostgreSQL port at the top-level for GitPod to handle
+  - port: 5432 # Declare the PostgreSQL port here at the top level
     onOpen: ignore # We don't need to open the database port in the browser directly
