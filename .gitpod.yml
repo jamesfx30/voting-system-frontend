@@ -3,28 +3,20 @@
 
 tasks:
   - name: Frontend Setup and Start
-    # This 'before' command will run before the main command.
-    # It replaces the [GITPOD_HOSTNAME] placeholder in vite.config.js
-    # with the actual hostname of the current GitPod workspace.
-    # This ensures Vite always knows the correct host for HMR and access.
     before: |
       echo "Updating vite.config.js with current GitPod hostname..."
       CURRENT_GITPOD_HOSTNAME=$(echo "$GITPOD_WORKSPACE_URL" | sed -E 's/https?:\/\///' | cut -d'/' -f1)
       sed -i "s/\\[GITPOD_HOSTNAME\\]/${CURRENT_GITPOD_HOSTNAME}/g" vite.config.js
       echo "vite.config.js updated successfully with $CURRENT_GITPOD_HOSTNAME"
       
-      # Ensure frontend dependencies are installed
       echo "Installing frontend dependencies..."
       npm install --prefix .
 
-    # The 'command' task will run after the 'before' task.
-    # This starts your frontend development server.
     command: |
       echo "Starting frontend development server..."
       npm run dev
 
   - name: Backend Setup and Start
-    # Ensure backend dependencies are installed and .env is set up
     init: |
       cd backend
       echo "Installing backend dependencies..."
@@ -49,7 +41,6 @@ tasks:
       EOF
       echo "Backend .env file configured."
 
-    # Start the backend server
     command: |
       cd backend
       echo "Starting backend server..."
@@ -58,9 +49,6 @@ tasks:
 # Define services needed for the workspace.
 # This configures a PostgreSQL database.
 services:
-  # 'database' is the alias by which your application can reach the PostgreSQL service.
-  # Your Node.js backend connects to PG_HOST=localhost, and GitPod will route that
-  # to this 'database' service.
   database:
     # Use the official PostgreSQL Docker image. Version 13 is a good stable choice.
     image: postgres:13
@@ -71,9 +59,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: jamesfx30 # Your actual PostgreSQL password from .env
       POSTGRES_DB: postgres
-    # Expose container port 5432 within GitPod's internal network.
-    ports:
-      - 5432
+    # Removed: 'ports: - 5432' from here, as it was causing the "additional properties" error.
+    # GitPod will automatically expose this via the top-level 'ports' section if needed.
 
 # List of ports to expose to the browser and their default behavior.
 # Port 5173 for frontend, 5000 for backend.
@@ -82,3 +69,5 @@ ports:
     onOpen: open-browser # Automatically opens frontend in a new browser tab
   - port: 5000
     onOpen: open-browser # Automatically opens backend in a new browser tab
+  - port: 5432 # Still declare the PostgreSQL port at the top-level for GitPod to handle
+    onOpen: ignore # We don't need to open the database port in the browser directly
